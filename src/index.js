@@ -57,7 +57,7 @@ let getRequestStoreOptions = (options, request) => {
 
 const pickKeysToArray = (keys, obj) =>
   keys.reduce((picked, key) =>
-    picked.concat([obj[key]]),
+    picked.concat(obj.hasOwnProperty(key) ? [obj[key]] : []),
     [])
 
 export const makeForageDriver = (options = {}) => {
@@ -90,7 +90,6 @@ export const makeForageDriver = (options = {}) => {
             ? request[method]
             : pickKeysToArray(paramsKeys, request[method])
           : [request[method]]
-      //console.warn('method', method, params, storeInstance, getRequestStoreOptions(options, request))
       return storeInstance[method].apply(storeInstance, params)
     }
   })
