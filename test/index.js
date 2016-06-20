@@ -8,12 +8,25 @@ let driver = makeForageDriver({
   driver: 'LOCALSTORAGE'
 })
 
-test('setItem', (t) => {
+test('setItem array', (t) => {
   localStorage.removeItem('test/testStore/value')
   driver(of({setItem: ['value', 'test']}))
     .mergeAll()
     .subscribe(x => {
       t.is(localStorage.getItem('test/testStore/value'), JSON.stringify('test'))
+      t.end()
+    })
+})
+
+test('setItem map', (t) => {
+  localStorage.removeItem('test/testStoreMap/value2')
+  driver(of({
+    storeName: 'testStoreMap',
+    setItem: {key: 'value2', value: 'test2'}
+  }))
+    .mergeAll()
+    .subscribe(x => {
+      t.is(localStorage.getItem('test/testStoreMap/value2'), JSON.stringify('test2'))
       t.end()
     })
 })

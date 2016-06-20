@@ -26,7 +26,7 @@ const getDriverName = (driver) => {
 
 const getDriver = (driver) =>
   typeof driver == 'string'
-    ? localforage[driver]
+    ? localforage[driver.toUpperCase()]
     : driver
 
 
@@ -58,6 +58,11 @@ let getRequestStoreOptions = (options, request) => {
   return storeOptions
 }
 
+const pickKeysToArray = (keys, obj) =>
+  keys.reduce((picked, key) =>
+    picked.concat([obj[key]]),
+    [])
+
 export const makeForageDriver = (options = {}) => {
   getStoreInstance(options)
   return makeAsyncDriver({
@@ -82,10 +87,13 @@ export const makeForageDriver = (options = {}) => {
         getRequestStoreOptions(options, request)
       )
       let params = request.method
-        ? paramsKeys.reduce((params, paramName) =>
-            params.concat([request[paramName]])
-          , [])
-        : (paramsKeys.length > 1 ? request[method] : [request[method]])
+        ? pickKeysToArray(paramsKeys, request)
+        : paramsKeys.length > 1
+          ? Array.isArray(request[method])
+            ? request[method]
+            : pickKeysToArray(paramsKeys, request[method])
+          : [request[method]]
+      console.log('method', method, params)
       return storeInstance[method].apply(storeInstance, params)
     }
   })

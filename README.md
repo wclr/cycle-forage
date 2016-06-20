@@ -18,18 +18,32 @@ npm instlal cycle-forage
 
 ## Usage
 
- Request format:
+#### Driver init 
+```js
+let driver = makeForageDriver({
+  name: 'test', // default db name
+  storeName: 'testStore', // default store name
+  driver: 'LOCALSTORAGE' // may be string
+})
+```
+
+#### Request
+
  ```js
  {
-    method: 'setItem',
+    // you may override default db and store for particular request
+    name: 'anotherDB',
+    storeName: 'anotherStore'
+    method: 'setItem', // explicit method
     key: 'author',
     value: 'Lewis Carol'
  }
  ```
-or (params array for methods with more then one param)
+Or this way (params for methods with more then one param may come as array):
  ```js
  {
-    setItem: ['author', 'Lewis Carol'],
+    setItem: ['author', 'Lewis Carol'], 
+    // setItem: {key: 'author', value: 'Lewis Carol'} is also supported
  }
  ```
 for methods with one arg, put no array 
@@ -39,7 +53,7 @@ for methods with one arg, put no array
  }
  ```
  
- #### `setItems`
+#### `setItems`
  
 `setItems` supports `key/value` array:
  ```js
