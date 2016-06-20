@@ -1,11 +1,12 @@
 const {of, merge} = require('rx-factory')
 const test = require('tape')
 const {makeForageDriver} = require('../lib')
+const localForage = require('localforage')
 
 let driver = makeForageDriver({
   name: 'test',
   storeName: 'testStore',
-  driver: 'LOCALSTORAGE'
+  driver: localForage.LOCALSTORAGE
 })
 
 test('setItem array', (t) => {
@@ -46,4 +47,30 @@ test('setItems', (t) => {
       t.is(localStorage.getItem('test2/testStore2/item2'), JSON.stringify('test2'))
       t.end()
     })
+})
+
+
+test('illegal driver in request', (t) => {
+  t.throws(() => {
+    driver(of({
+      storeName: 'testStore2',
+      driver: '',
+      method: 'setItem',
+      key: 'should', value: 'throw'
+    })).mergeAll()
+      .subscribe(x => {
+      })
+  })
+  t.end()
+})
+
+test('illegal driver on init', (t) => {
+  t.throws(() => {
+    let driver = makeForageDriver({
+      name: 'test',
+      storeName: 'testStore',
+      driver: ''
+    })
+  })
+  t.end()
 })

@@ -20,12 +20,17 @@ npm instlal cycle-forage
 
 #### Driver init 
 ```js
+import {makeForageDriver} from 'cycle-forage'
+import localForage from 'localforage'
+
 let driver = makeForageDriver({
   name: 'test', // default db name
   storeName: 'testStore', // default store name
-  driver: 'LOCALSTORAGE' // may be string
+  driver: localforage.WEBSQL // localForage.LOCALSTORAGE, localForage.INDEXEDDB
 })
 ```
+
+By default if driver not passed localForage uses indexeddb as storage engine. 
 
 #### Request
 

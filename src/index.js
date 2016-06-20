@@ -24,12 +24,6 @@ const getDriverName = (driver) => {
   return (driver && driver._driver) || driver
 }
 
-const getDriver = (driver) =>
-  typeof driver == 'string'
-    ? localforage[driver.toUpperCase()]
-    : driver
-
-
 const getStoreInstanceKey = (storeOptions) => {
   return [
     'store',
@@ -44,17 +38,20 @@ const storeInstancesMap = {}
 const getStoreInstance = (options) => {
   var key = getStoreInstanceKey(options)
   if (!storeInstancesMap[key]){
-    let opts = {...options, driver: getDriver(options.driver)}
-    storeInstancesMap[key] = localforage.createInstance(opts)
+    if (options.hasOwnProperty('driver') && !options.driver){
+      throw new Error(`Illegal localforage driver option passed`)
+    }
+    storeInstancesMap[key] = localforage.createInstance(options)
   }
   return storeInstancesMap[key]
 }
 
 let getRequestStoreOptions = (options, request) => {
   let storeOptions = {...options}
-  let {name, storeName} = request
-  name && (storeOptions.name = name)
-  storeName && (storeOptions.storeName = storeName)
+  let {name, storeName, driver} = request
+  driver !== undefined && (storeOptions.driver = driver)
+  name !== undefined && (storeOptions.name = name)
+  storeName !== undefined && (storeOptions.storeName = storeName)
   return storeOptions
 }
 
@@ -93,7 +90,7 @@ export const makeForageDriver = (options = {}) => {
             ? request[method]
             : pickKeysToArray(paramsKeys, request[method])
           : [request[method]]
-      console.log('method', method, params)
+      //console.warn('method', method, params, storeInstance, getRequestStoreOptions(options, request))
       return storeInstance[method].apply(storeInstance, params)
     }
   })
